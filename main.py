@@ -66,7 +66,7 @@ def primary_window():
         event, values = window.read()
         name = values["-IN1-"]
 
-        # .lower() being used to roughly negate case-sensitive differences
+        # .lower() being used to roughly negate case-sensitive differences for now
 
         if event in (sg.WINDOW_CLOSE_ATTEMPTED_EVENT, "Exit"):
             exit_window()
@@ -77,16 +77,14 @@ def primary_window():
             else:
                 item = Item(values["-IN1-"].lower(), values["-IN2-"])
                 ITEMS_LIST.append(item)
-                print(item.name)
                 window["-LIST-"].update(ITEMS_LIST)
 
         if event == "Finalize List":
             check = confirm()
-            if check == True:
+            if check:
                 return get_phone_info()
 
         if event == "Delete":
-            print(values["-LIST-"])
             item = values["-LIST-"][0]
             ITEMS_LIST.remove(item)
             del Item.items_dict[item.name]
@@ -117,7 +115,7 @@ def repeated_item_window():
 
     while True:
 
-        event, values = window.read()
+        event, _ = window.read()
         if event in ["OK", "Cancel", sg.WIN_CLOSED]:
             break
 
@@ -133,7 +131,8 @@ def confirm():
     layout = [
         [
             sg.Text(
-                "Are you sure you want to finalize your list?\nYou will not be able to edit your list beyond this point."
+                "Are you sure you want to finalize your list?\n"
+                "You will not be able to edit your list beyond this point."
             )
         ],
         [sg.Button("Confirm"), sg.Button("Cancel")],
@@ -142,7 +141,7 @@ def confirm():
     window = sg.Window("Confirm Finalization", layout, modal=True)
 
     while True:
-        event, values = window.read()
+        event, _ = window.read()
 
         if event == "Confirm":
             return True
@@ -161,7 +160,7 @@ def get_phone_info():
     layout = [
         [sg.Text("Enter Number and select Carrier, then click Finalize.")],
         [sg.Input(key="-IN1-")],
-        [sg.DropDown([key for key in CARRIERS], key="-IN2-")],
+        [sg.DropDown(list(CARRIERS), key="-IN2-")],
         [sg.Button("Finalize")],
     ]
 
@@ -185,7 +184,7 @@ def get_phone_info():
 def quantity_window(item):
     """Window which allows user to edit their selected item's quantity
 
-    :param item: Item object which was selected via highlight/right click in the primary window ListBox
+    :param item: Item object which was selected via highlight/right click in the primary window
     :type item: Item_Class.Item
     """
     layout = [
@@ -213,7 +212,7 @@ def quantity_window(item):
 def rename_window(item):
     """Window which allows user to change their selected item's name
 
-    :param item: Item object which was selected via highlight/right click in the primary window ListBox
+    :param item: Item object which was selected via highlight/right click in the primary window
     :type item: Item_Class.Item
     """
     layout = [
@@ -238,7 +237,7 @@ def rename_window(item):
 
 
 def exit_window():
-    """Window for user to confirm they wish to terminate the program without completing their list."""
+    """Window for user to confirm termination of the program without completing list"""
     layout = [
         [sg.Text("This will clear your list, are you sure?")],
         [sg.Button("Yes, Exit"), sg.Button("Cancel")],
@@ -251,14 +250,12 @@ def exit_window():
     )
 
     while True:
-        event, values = window.read()
+        event, _ = window.read()
 
         if event in ["Cancel", sg.WIN_CLOSED]:
-            break
+            window.close()
         else:
             sys.exit()
-
-    window.close()
 
 
 def send_email(number, carrier):
